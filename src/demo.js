@@ -9,7 +9,7 @@ import {
   ValueAxis,
   Legend
 } from "@devexpress/dx-react-chart-material-ui";
-import { energyConsumption as data } from "../../../demo-data/data-vizualization";
+import { energyConsumption as data } from "./demo-data/data-vizualization";
 
 const rootStyles = {
   display: "flex",
@@ -42,13 +42,13 @@ const itemStyles = {
 const LegendItem = (props) => <Legend.Item {...props} style={itemStyles} />;
 
 export default (props) => {
-  const state = React.useState({
-    data,
+  const [state, setState] = React.useState({
+    data, 
     hover: undefined
   });
 
   const changeHover = React.useCallback(
-    (hover) => this.setState({ hover }),
+    (hover) => setState(old => ({ ...old, hover })),
     []
   );
 
@@ -59,7 +59,11 @@ export default (props) => {
       hoveredSeriesName
     };
   });
-  React.useEffect(() => legendLabel.update(), [legendLabel]);
+  try {
+    React.useEffect(() => legendLabel.update(), [legendLabel]);
+  } catch (e) {
+    console.error(e);
+  }
 
   const { data: chartData, hover } = state;
 
