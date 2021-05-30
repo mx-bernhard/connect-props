@@ -43,7 +43,7 @@ const LegendItem = (props) => <Legend.Item {...props} style={itemStyles} />;
 
 export default (props) => {
   const [state, setState] = React.useState({
-    data, 
+    data,
     hover: undefined
   });
 
@@ -52,16 +52,8 @@ export default (props) => {
     []
   );
 
-  const legendLabel = connectProps(LegendLabel, () => {
-    const { hover } = state;
-    const hoveredSeriesName = hover ? hover.series : undefined;
-    return {
-      hoveredSeriesName
-    };
-  });
-  React.useEffect(() => legendLabel.update(), [legendLabel]);
-
   const { data: chartData, hover } = state;
+  const legendLabel = React.useCallback(props => <LegendLabel {...props} hoveredSeriesName={hover ? hover.series : undefined} />, [hover]);
 
   return (
     <Paper>
