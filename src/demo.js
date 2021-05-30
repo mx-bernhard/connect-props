@@ -1,6 +1,5 @@
 import * as React from "react";
 import Paper from "@material-ui/core/Paper";
-import { connectProps } from "@devexpress/dx-react-core";
 import { EventTracker, HoverState } from "@devexpress/dx-react-chart";
 import {
   Chart,
@@ -10,6 +9,7 @@ import {
   Legend
 } from "@devexpress/dx-react-chart-material-ui";
 import { energyConsumption as data } from "./demo-data/data-vizualization";
+import useCompareDebugger from "react-use-compare-debugger";
 
 const rootStyles = {
   display: "flex",
@@ -28,9 +28,9 @@ const hoveredLabelStyles = {
   ...defaultLabelStyles,
   color: "black"
 };
-const LegendLabel = ({ hoveredSeriesName, text }) => (
+const LegendLabel = ({ hovered, text }) => (
   <div
-    style={hoveredSeriesName === text ? hoveredLabelStyles : defaultLabelStyles}
+    style={hovered ? hoveredLabelStyles : defaultLabelStyles}
   >
     {text}
   </div>
@@ -40,7 +40,17 @@ const itemStyles = {
   flexDirection: "column-reverse"
 };
 const LegendItem = (props) => <Legend.Item {...props} style={itemStyles} />;
-const LegendLabelFac = hoverRef => props => <LegendLabel {...props} hoveredSeriesName={hoverRef.current ? hoverRef.current.series : undefined} />;
+const LegendLabelFac = hoverRef => {
+  console.log("new LegendLabel component");
+  return props => {
+    console.log("rendering LegendLabel " + props.text);
+    const hoveredSeriesName = hoverRef.current ? hoverRef.current.series : undefined;
+    const hovered = hoveredSeriesName === props.text;
+    //useCompareDebugger("LegendLabel", { ...props, hovered }, []);
+
+    return <LegendLabel key={props.text} {...props} hovered={hovered}/>;
+  };
+};
 
 export default (props) => {
   const [state, setState] = React.useState({
@@ -58,7 +68,9 @@ export default (props) => {
   );
 
   const { data: chartData, hover } = state;
-  const legendLabel = React.useMemo(() => LegendLabelFac(hoverRef));
+  const legendLabel = React.useMemo(() => {
+    return LegendLabelFac(hoverRef);
+  }, [hoverRef]);
 
   return (
     <Paper>
