@@ -59,11 +59,7 @@ export default (props) => {
       hoveredSeriesName
     };
   });
-  try {
-    React.useEffect(() => legendLabel.update(), [legendLabel]);
-  } catch (e) {
-    console.error(e);
-  }
+  React.useEffect(() => legendLabel.update(), [legendLabel]);
 
   const { data: chartData, hover } = state;
 
