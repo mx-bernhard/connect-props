@@ -40,20 +40,25 @@ const itemStyles = {
   flexDirection: "column-reverse"
 };
 const LegendItem = (props) => <Legend.Item {...props} style={itemStyles} />;
+const LegendLabelFac = hoverRef => props => <LegendLabel {...props} hoveredSeriesName={hoverRef.current ? hoverRef.current.series : undefined} />;
 
 export default (props) => {
   const [state, setState] = React.useState({
     data,
     hover: undefined
   });
+  const hoverRef = React.useRef(undefined);
 
   const changeHover = React.useCallback(
-    (hover) => setState(old => ({ ...old, hover })),
+    (hover) => {
+      hoverRef.current = hover;
+      setState(old => ({...old, hover}));
+    },
     []
   );
 
   const { data: chartData, hover } = state;
-  const legendLabel = React.useCallback(props => <LegendLabel {...props} hoveredSeriesName={hover ? hover.series : undefined} />, [hover]);
+  const legendLabel = React.useMemo(() => LegendLabelFac(hoverRef));
 
   return (
     <Paper>
