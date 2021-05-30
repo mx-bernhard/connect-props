@@ -11,7 +11,7 @@ import {
   ValueAxis,
   Legend,
 } from '@devexpress/dx-react-chart-material-ui';
-import { energyConsumption as data } from '../../../demo-data/data-vizualization';
+import { energyConsumption as data } from './demo-data/data-vizualization';
 
 const rootStyles = {
   display: 'flex',
