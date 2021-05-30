@@ -28,13 +28,18 @@ const hoveredLabelStyles = {
   ...defaultLabelStyles,
   color: "black"
 };
-const LegendLabel = ({ hovered, text }) => (
-  <div
-    style={hovered ? hoveredLabelStyles : defaultLabelStyles}
-  >
-    {text}
-  </div>
-);
+const LegendLabel = (props) => {
+  // useCompareDebugger("LegendLabel", props, []);
+  console.log("rendering LegendLabel " + props.text);
+  return (
+    <div
+      style={props.hovered ? hoveredLabelStyles : defaultLabelStyles}
+    >
+      {props.text}
+    </div>
+  );
+};
+const MemoLegendLabel = React.memo(LegendLabel, (p1, p2) => p1.text == p2.text && p1.hovered == p2.hovered);
 
 const itemStyles = {
   flexDirection: "column-reverse"
@@ -43,38 +48,34 @@ const LegendItem = (props) => <Legend.Item {...props} style={itemStyles} />;
 const LegendLabelFac = hoverRef => {
   console.log("new LegendLabel component");
   return props => {
-    console.log("rendering LegendLabel " + props.text);
+    console.log("rendering LegendLabelWithHover " + props.text);
     const hoveredSeriesName = hoverRef.current ? hoverRef.current.series : undefined;
     const hovered = hoveredSeriesName === props.text;
-    //useCompareDebugger("LegendLabel", { ...props, hovered }, []);
+    //useCompareDebugger("LegendLabelWithHover", { ...props, hovered }, []);
 
-    return <LegendLabel key={props.text} {...props} hovered={hovered}/>;
+    return <MemoLegendLabel {...props} hovered={hovered}/>;
   };
 };
 
 export default (props) => {
-  const [state, setState] = React.useState({
-    data,
-    hover: undefined
-  });
+  const update = React.useReducer(i => i + 1, 0)[1];
   const hoverRef = React.useRef(undefined);
 
   const changeHover = React.useCallback(
     (hover) => {
       hoverRef.current = hover;
-      setState(old => ({...old, hover}));
+      update();
     },
     []
   );
 
-  const { data: chartData, hover } = state;
   const legendLabel = React.useMemo(() => {
     return LegendLabelFac(hoverRef);
   }, [hoverRef]);
 
   return (
     <Paper>
-      <Chart data={chartData}>
+      <Chart data={data}>
         <ArgumentAxis />
         <ValueAxis />
 
@@ -103,7 +104,7 @@ export default (props) => {
         />
 
         <EventTracker />
-        <HoverState hover={hover} onHoverChange={changeHover} />
+        <HoverState hover={hoverRef.current} onHoverChange={changeHover} />
       </Chart>
     </Paper>
   );
